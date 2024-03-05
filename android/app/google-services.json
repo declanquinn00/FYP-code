@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "834086430678",
+    "project_id": "carerassistant-64205",
+    "storage_bucket": "carerassistant-64205.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:834086430678:android:1b64d5c081c0e33a446677",
+        "android_client_info": {
+          "package_name": "com.quinnd13.carerassistant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcRwg9zM6H2CiG6uJSUk2oMXXBAw9oKjU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
