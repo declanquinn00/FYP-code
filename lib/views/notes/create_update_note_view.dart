@@ -43,6 +43,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   }
 
   Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {
+    // get an existing note
     final widgetNote = context.getArgument<DatabaseNote>();
     // If note already exists recreate it
     if (widgetNote != null) {

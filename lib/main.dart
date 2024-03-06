@@ -1,5 +1,6 @@
 import 'package:carerassistant/constants/routes.dart';
 import 'package:carerassistant/firebase_options.dart';
+import 'package:carerassistant/views/profile_screen.dart';
 import 'package:carerassistant/views/notes/entry_view.dart';
 import 'package:carerassistant/views/login_view.dart';
 import 'package:carerassistant/views/notes/create_update_note_view.dart';
@@ -9,6 +10,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
+
+import 'package:path/path.dart';
 
 void main() {
   // initialize firebase
@@ -25,7 +28,8 @@ void main() {
         registerRoute: (context) => const RegisterView(),
         homeRoute: (context) => const NotesView(),
         verifyEmailRoute: (context) => const VerifyEmailView(),
-        createOrUpdateNoteRoute: (context) => const CreateUpdateNoteView()
+        createOrUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
+        profileViewRoute: (context) => const ProfileScreenView()
       },
     ),
   );
@@ -45,6 +49,10 @@ class HomePage extends StatelessWidget {
           case ConnectionState.done:
             final user = FirebaseAuth.instance.currentUser;
             devtools.log(user.toString());
+
+            // DEBUG !!!!!
+            return const ProfileScreenView();
+
             if (user != null) {
               // Reload Users Status
               if (user.emailVerified) {

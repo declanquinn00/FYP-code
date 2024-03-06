@@ -309,6 +309,7 @@ class DatabaseUser {
   int get hashCode => id.hashCode;
 }
 
+// !!! Database Note class
 class DatabaseNote {
   final int id;
   final int userId;

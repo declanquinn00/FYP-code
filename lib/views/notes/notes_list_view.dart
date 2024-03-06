@@ -1,6 +1,7 @@
 import 'package:carerassistant/services/entity_service.dart';
 import 'package:carerassistant/utilities/dialogs/delete_dialog.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as devtools show log;
 
 // !!!!!!! Takes a note and is just a function used to tell app to delete entry
 typedef NoteCallback = void Function(DatabaseNote note);
@@ -23,9 +24,11 @@ class NotesListView extends StatelessWidget {
       itemCount: notes.length,
       itemBuilder: (context, index) {
         final note = notes[index];
+        // notes list items
         return ListTile(
           onTap: () {
             onTap(note);
+            devtools.log('Note tapped');
           },
           title: Text(
             note.text,
@@ -33,6 +36,7 @@ class NotesListView extends StatelessWidget {
             softWrap: true,
             overflow: TextOverflow.ellipsis,
           ),
+          // Delete Button
           trailing: IconButton(
             onPressed: () async {
               final shouldDelete = await showDeleteDialog(context);

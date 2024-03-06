@@ -18,11 +18,12 @@ class NotesView extends StatefulWidget {
 // *****!
 class _NotesViewState extends State<NotesView> {
   // ****!
-  String? userEmail() {
+  String userEmail() {
     final user = FirebaseAuth.instance.currentUser;
     try {
       if (user != null) {
-        return user.email;
+        // user has to have an email
+        return user.email!;
       } else {
         throw EmailNotFound();
       }
@@ -86,7 +87,7 @@ class _NotesViewState extends State<NotesView> {
       ),
       body: FutureBuilder(
         // **!
-        future: _notesService.getOrCreateUser(email: 'quinnd13@tcd.ie'),
+        future: _notesService.getOrCreateUser(email: userEmail()),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
