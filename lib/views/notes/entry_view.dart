@@ -60,6 +60,13 @@ class _NotesViewState extends State<NotesView> {
             },
             icon: const Icon(Icons.add),
           ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil(profileViewRoute, (route) => false);
+            },
+            icon: const Icon(Icons.person),
+          ),
           PopupMenuButton<MenuAction>(onSelected: (value) async {
             switch (value) {
               // get result from logout dialog

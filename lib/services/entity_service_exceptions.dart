@@ -19,3 +19,5 @@ class CouldNotUpdateNote implements Exception {}
 class EmailNotFound implements Exception {}
 
 class UserShouldBeSetBeforeReadingAllNotes implements Exception {}
+
+class ProfileDoesNotExist implements Exception {}

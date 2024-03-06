@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:carerassistant/extensions/list/filter.dart';
 import 'package:carerassistant/services/entity_service_exceptions.dart';
@@ -303,9 +304,79 @@ CREATE TABLE IF NOT EXISTS "entry" (
 );
 ''';
       await db.execute(createNoteTable);
+
+      // !!! profile table
+      await db.execute(createProfileTable);
+
       await _cacheNotes();
     } on MissingPlatformDirectoryException {
       throw UnableToGetDocumentsDirectory();
+    }
+  }
+
+  Future<DatabaseProfile> createProfile({
+    required int userID,
+    required String Title,
+    required Uint8List PhotoA,
+    required Uint8List PhotoB,
+    required String Description,
+  }) async {
+    await _ensureDbIsOpen();
+    final db = _getDatabaseOrThrow();
+    final results = await db.query(
+      profileTable,
+      limit: 1,
+      where: 'user_id = ?',
+      whereArgs: [userID],
+    );
+    if (results.isNotEmpty) {
+      throw UserAlreadyExists();
+    }
+
+    await db.insert(userTable, {
+      "user_id": userID,
+      "Title": Title,
+      "PhotoA": PhotoA,
+      "PhotoB": PhotoB,
+      "Description": Description,
+    });
+
+    return DatabaseProfile(
+        user_id: userID,
+        Title: Title,
+        PhotoA: PhotoA,
+        PhotoB: PhotoB,
+        Description: Description);
+  }
+
+  // delete user profile (if needed)
+  Future<void> deleteProfile({required int userID}) async {
+    await _ensureDbIsOpen();
+    final db = _getDatabaseOrThrow();
+    final deletedCount = await db.delete(
+      profileTable,
+      where: 'user_id = ?',
+      whereArgs: [userID],
+    );
+    if (deletedCount != 1) {
+      throw CouldNotDeleteUser();
+    }
+  }
+
+  Future<DatabaseProfile> getProfile({required int userID}) async {
+    await _ensureDbIsOpen();
+    final db = _getDatabaseOrThrow();
+    final results = await db.query(
+      profileTable,
+      limit: 1,
+      where: 'user_id = ?',
+      whereArgs: [userID],
+    );
+    if (results.isEmpty) {
+      throw ProfileDoesNotExist();
+    } else {
+      DatabaseProfile profile = DatabaseProfile.fromRow(results.first);
+      return profile;
     }
   }
 }
@@ -374,29 +445,50 @@ class DatabaseNote {
   int get hashCode => id.hashCode;
 }
 
+class DatabaseProfile {
+  final int user_id;
+  final String Title;
+  final Uint8List? PhotoA;
+  final Uint8List? PhotoB;
+  final String Description;
+
+  DatabaseProfile(
+      {required this.user_id,
+      required this.Title,
+      required this.PhotoA,
+      required this.PhotoB,
+      required this.Description});
+
+// !!! Photos must be mapped correctly
+  DatabaseProfile.fromRow(Map<String, Object?> map)
+      : user_id = map['user_id'] as int,
+        Title = map['Title'] as String,
+        PhotoA = map['PhotoA'] as Uint8List,
+        PhotoB = map['PhotoB'] as Uint8List,
+        Description = (map['Description'] as String);
+
+  @override
+  String toString() {
+    return 'user_Id = $user_id, Title = $Title, Description = $Description';
+  }
+
+  @override
+  bool operator ==(covariant DatabaseProfile other) => user_id == other.user_id;
+
+  @override
+  int get hashCode => user_id.hashCode;
+}
+
 const dbName = 'notes.db';
 const noteTable = 'note';
 const userTable = 'user';
+const profileTable = 'profile';
 const idColumn = 'id';
 const emailColumn = 'email';
 const userIdColumn = 'user_id';
 const textColumn = 'text';
 const isSyncedWithCloudColumn = 'is_synced_with_cloud';
-/*
-const createUserTable = '''CREATE TABLE IF NOT EXISTS "user" (
-        "id"	INTEGER NOT NULL,
-        "email"	TEXT NOT NULL UNIQUE,
-        PRIMARY KEY("id" AUTOINCREMENT)
-      );''';
-const createNoteTable = '''CREATE TABLE IF NOT EXISTS "note" (
-        "id"	INTEGER NOT NULL,
-        "user_id"	INTEGER NOT NULL,
-        "text"	TEXT,
-        "is_synced_with_cloud"	INTEGER NOT NULL DEFAULT 0,
-        FOREIGN KEY("user_id") REFERENCES "user"("id"),
-        PRIMARY KEY("id" AUTOINCREMENT)
-      );''';
-*/
+
 const createUserTable = '''
 CREATE TABLE IF NOT EXISTS "user" (
 	"id"	INTEGER NOT NULL,
@@ -413,5 +505,17 @@ CREATE TABLE IF NOT EXISTS "entry" (
 	"is_synced_with_cloud"	INTEGER DEFAULT 0,
 	FOREIGN KEY("user_id") REFERENCES "user"("ID"),
 	PRIMARY KEY("ID" AUTOINCREMENT)
+);
+''';
+
+const createProfileTable = '''
+CREATE TABLE "Profile" (
+	"user_id"	INTEGER UNIQUE,
+	"Title"	TEXT,
+	"PhotoA"	BLOB,
+	"PhotoB"	BLOB,
+	"Description"	TEXT,
+	FOREIGN KEY("user_id") REFERENCES "user"("ID"),
+	PRIMARY KEY("user_id")
 );
 ''';

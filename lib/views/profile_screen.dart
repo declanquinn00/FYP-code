@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:carerassistant/constants/routes.dart';
+import 'package:carerassistant/services/entity_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as devtools show log;
@@ -14,6 +16,21 @@ class ProfileScreenView extends StatefulWidget {
 class _ProfileScreenViewState extends State<ProfileScreenView> {
   File? _imageA;
   File? _imageB;
+  late final NotesService _notesService;
+
+  // open the database
+  @override
+  void initState() {
+    _notesService = NotesService();
+    super.initState();
+  }
+/*
+  @override
+  void dispose() {
+    _notesService.close();
+    super.dispose();
+  }
+*/
 
   Future selectImageA(ImageSource source) async {
     try {
@@ -51,39 +68,57 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: const Text('Profile')),
+        appBar: AppBar(
+          title: const Text('Profile'),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    editProfileViewRoute, (_) => false);
+              },
+              icon: const Icon(Icons.edit),
+            ),
+            IconButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .pushNamedAndRemoveUntil(homeRoute, (_) => false);
+              },
+              icon: const Icon(Icons.home),
+            ),
+          ],
+        ),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Spacer(),
-            _imageA != null
-                ? Image.file(
-                    _imageA!,
-                    width: 150,
-                    height: 150,
-                  )
-                : FlutterLogo(size: 160),
-            _imageB != null
-                ? Image.file(
-                    _imageB!,
-                    width: 150,
-                    height: 150,
-                  )
-                : FlutterLogo(size: 160),
-            const SizedBox(height: 24),
             Text(
               'This is your profile',
-              style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
-            TextButton(
-                onPressed: () {
-                  selectImageA(ImageSource.gallery);
-                },
-                child: const Text('Select photo from gallery')),
-            TextButton(
-                onPressed: () {
-                  selectImageB(ImageSource.camera);
-                },
-                child: const Text('Select photo from camera'))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: _imageA != null
+                      ? Image.file(
+                          _imageA!,
+                          width: 150,
+                          height: 150,
+                        )
+                      : FlutterLogo(size: 160),
+                ),
+                Expanded(
+                  child: _imageB != null
+                      ? Image.file(
+                          _imageB!,
+                          width: 150,
+                          height: 150,
+                        )
+                      : FlutterLogo(size: 160),
+                ),
+              ],
+            ),
+            const Text('Blah'),
           ],
         ));
   }
