@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:carerassistant/constants/routes.dart';
+import 'package:carerassistant/services/entity_service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as devtools show log;
@@ -15,15 +17,129 @@ class EditProfileScreenView extends StatefulWidget {
 class _EditProfileScreenViewState extends State<EditProfileScreenView> {
   File? _imageA;
   File? _imageB;
+  Uint8List? _imageALoaded;
+  Uint8List? _imageBLoaded;
   late final _name;
   late final _content;
+  late final NotesService _notesService;
+  late final DatabaseProfile? _profile;
 
   // Create init late vars
   @override
   void initState() {
     _name = TextEditingController();
     _content = TextEditingController();
+    _notesService = NotesService();
+    _loadProfileData();
+    // Fill fields if profile is not null
+/*
+    if (_profile != null) {
+      if (_profile!.Title.isNotEmpty) {
+        _name.text = _profile!.Title;
+      }
+      if (_profile!.Description.isNotEmpty) {
+        _content.text = _profile!.Description;
+      }
+    }
+*/
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _content.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadProfileData() async {
+    try {
+      // !!! REPLACE WITH EMAIL !!!
+      DatabaseUser user = await _notesService.getUser(email: 'quinnd13@tcd.ie');
+      int userID = user.id;
+      devtools.log('Loading Profile Data');
+      _profile = await _notesService.getProfile(userID: userID);
+      devtools.log('Profile Data loaded');
+      if (_profile != null) {
+        setState(() {
+          _imageALoaded = _profile?.PhotoA != null ? _profile!.PhotoA : null;
+          _imageBLoaded = _profile?.PhotoB != null ? _profile!.PhotoB : null;
+          _name.text = _profile!.Title.isNotEmpty ? _profile!.Title : null;
+          _content.text =
+              _profile!.Description.isNotEmpty ? _profile!.Description : null;
+        });
+        devtools.log('Image Data loaded');
+      } else {
+        devtools.log('Profile was empty');
+      }
+    } catch (e) {
+      devtools.log('Error loading profile data: $e');
+    }
+  }
+
+  Future<void> saveProfileData() async {
+    try {
+      String title = _name.text;
+      String description = _content.text;
+      Uint8List photoABytes = _imageA != null
+          ? await _imageA!.readAsBytes()
+          : _imageALoaded != null
+              ? _imageALoaded!
+              : Uint8List(0);
+      Uint8List photoBBytes = _imageB != null
+          ? await _imageB!.readAsBytes()
+          : _imageBLoaded != null
+              ? _imageBLoaded!
+              : Uint8List(0);
+
+      // !!! REPLACE WITH EMAIL !!!
+      DatabaseUser user = await _notesService.getUser(email: 'quinnd13@tcd.ie');
+      int userID = user.id;
+
+      try {
+        DatabaseProfile existingProfile =
+            await _notesService.getProfile(userID: userID);
+        // If a profile exists, you can handle it here
+        devtools.log('Profile already exists, updating...');
+        devtools.log('Pre Updated Profile: $existingProfile');
+
+        // Update existing profile
+        await _notesService.updateProfile(
+          profile: existingProfile,
+          title: title,
+          description: description,
+          PhotoA: photoABytes,
+          PhotoB: photoBBytes,
+        );
+        devtools.log('Profile updated successfully');
+        DatabaseProfile updatedProfile =
+            await _notesService.getProfile(userID: userID);
+        devtools.log('Post Updated Profile: $updatedProfile');
+/*
+        // DEBUG delete a profile
+        devtools.log('DELETING PROFILE');
+        await _notesService.deleteProfile(userID: userID);
+        devtools.log('PROFILE DELETED');
+*/
+        return;
+      } catch (e) {
+        devtools.log('Profile does not exist');
+      }
+
+      // create new profile
+      await _notesService.createProfile(
+        userID: userID,
+        Title: title,
+        PhotoA: photoABytes,
+        PhotoB: photoBBytes,
+        Description: description,
+      );
+      // !!! DEBUG
+      DatabaseProfile profile = await _notesService.getProfile(userID: userID);
+      devtools.log('Saved Profile: $profile');
+    } catch (e) {
+      devtools.log('Updating Profile Error: $e');
+    }
   }
 
   Future selectImageA(ImageSource source) async {
@@ -36,6 +152,7 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
 
         setState(() {
           _imageA = selectedPhoto;
+          //_imageALoaded = null;
         });
       }
     } catch (e) {
@@ -52,6 +169,7 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
         final selectedPhoto = File(photo.path);
         setState(() {
           _imageB = selectedPhoto;
+          //_imageBLoaded = null;
         });
       }
     } catch (e) {
@@ -63,11 +181,12 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('Edit Profile'),
         actions: [
           IconButton(
-            onPressed: () {
-              // Save new Values and pass to DB
+            onPressed: () async {
+              await saveProfileData();
+              devtools.log('Create/update profile complete');
               Navigator.of(context)
                   .pushNamedAndRemoveUntil(profileViewRoute, (route) => false);
             },
@@ -103,26 +222,59 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
                   onTap: () {
                     selectImageA(ImageSource.gallery);
                   },
+                  /*
+                  child: _imageALoaded != null && _imageALoaded!.isNotEmpty
+                      ? _imageA != null
+                          ? Image.file(
+                              key: UniqueKey(),
+                              _imageA!,
+                              width: 150,
+                              height: 150,
+                            )
+                          : Image.memory(
+                              key: UniqueKey(),
+                              _imageALoaded!,
+                              width: 150,
+                              height: 150,
+                            )
+                      : FlutterLogo(size: 160),
+                      */
                   child: _imageA != null
                       ? Image.file(
+                          key: UniqueKey(),
                           _imageA!,
                           width: 150,
                           height: 150,
                         )
-                      : FlutterLogo(size: 160),
+                      : (_imageALoaded != null && _imageALoaded!.isNotEmpty)
+                          ? Image.memory(
+                              key: UniqueKey(),
+                              _imageALoaded!,
+                              width: 150,
+                              height: 150,
+                            )
+                          : FlutterLogo(size: 160),
                 )),
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
-                      selectImageB(ImageSource.camera);
+                      selectImageB(ImageSource.gallery);
                     },
                     child: _imageB != null
                         ? Image.file(
+                            key: UniqueKey(),
                             _imageB!,
                             width: 150,
                             height: 150,
                           )
-                        : FlutterLogo(size: 160),
+                        : (_imageBLoaded != null && _imageBLoaded!.isNotEmpty)
+                            ? Image.memory(
+                                key: UniqueKey(),
+                                _imageBLoaded!,
+                                width: 150,
+                                height: 150,
+                              )
+                            : FlutterLogo(size: 160),
                   ),
                 ),
               ],

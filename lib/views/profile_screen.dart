@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:carerassistant/constants/routes.dart';
 import 'package:carerassistant/services/entity_service.dart';
@@ -14,14 +15,36 @@ class ProfileScreenView extends StatefulWidget {
 }
 
 class _ProfileScreenViewState extends State<ProfileScreenView> {
-  File? _imageA;
-  File? _imageB;
+  Uint8List? _imageA;
+  Uint8List? _imageB;
+  late final _name;
+  late final _content;
   late final NotesService _notesService;
+  late DatabaseProfile? _profile;
+
+  Future<void> _loadProfileData() async {
+    try {
+      // !!! REPLACE WITH EMAIL !!!
+      DatabaseUser user = await _notesService.getUser(email: 'quinnd13@tcd.ie');
+      int userID = user.id;
+      _profile = await _notesService.getProfile(userID: userID);
+      if (_profile != null) {
+        setState(() {
+          _imageA = _profile!.PhotoA != null ? _profile!.PhotoA! : null;
+          _imageB = _profile!.PhotoB != null ? _profile!.PhotoB! : null;
+        });
+      }
+    } catch (e) {
+      devtools.log('Error loading profile data: $e');
+    }
+  }
 
   // open the database
   @override
   void initState() {
     _notesService = NotesService();
+    _profile = null;
+    _loadProfileData();
     super.initState();
   }
 /*
@@ -32,75 +55,46 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
   }
 */
 
-  Future selectImageA(ImageSource source) async {
-    try {
-      final photo = await ImagePicker().pickImage(source: source);
-      if (photo == null) {
-        return null;
-      } else {
-        final selectedPhoto = File(photo.path);
-
-        setState(() {
-          _imageA = selectedPhoto;
-        });
-      }
-    } catch (e) {
-      devtools.log('An Error Occurred in Selecting Image ' + e.toString());
-    }
-  }
-
-  Future selectImageB(ImageSource source) async {
-    try {
-      final photo = await ImagePicker().pickImage(source: source);
-      if (photo == null) {
-        return null;
-      } else {
-        final selectedPhoto = File(photo.path);
-        setState(() {
-          _imageB = selectedPhoto;
-        });
-      }
-    } catch (e) {
-      devtools.log('An Error Occurred in Selecting Image ' + e.toString());
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile'),
-          actions: [
-            IconButton(
-              onPressed: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    editProfileViewRoute, (_) => false);
-              },
-              icon: const Icon(Icons.edit),
-            ),
-            IconButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pushNamedAndRemoveUntil(homeRoute, (_) => false);
-              },
-              icon: const Icon(Icons.home),
-            ),
-          ],
-        ),
-        body: Column(
+      appBar: AppBar(
+        title: const Text('Profile'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil(editProfileViewRoute, (_) => false);
+            },
+            icon: const Icon(Icons.edit),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil(homeRoute, (_) => false);
+            },
+            icon: const Icon(Icons.home),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'This is your profile',
+              //_profile.Title,
+              _profile != null && _profile!.Title.isNotEmpty
+                  ? _profile!.Title
+                  : 'Your Profile',
               style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
-                  child: _imageA != null
-                      ? Image.file(
+                  child: _imageA != null && _imageA!.isNotEmpty
+                      ? Image.memory(
                           _imageA!,
                           width: 150,
                           height: 150,
@@ -108,8 +102,8 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
                       : FlutterLogo(size: 160),
                 ),
                 Expanded(
-                  child: _imageB != null
-                      ? Image.file(
+                  child: _imageB != null && _imageB!.isNotEmpty
+                      ? Image.memory(
                           _imageB!,
                           width: 150,
                           height: 150,
@@ -118,8 +112,15 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
                 ),
               ],
             ),
-            const Text('Blah'),
+            Text(
+              // !!!
+              _profile != null && _profile!.Description.isNotEmpty
+                  ? _profile!.Description
+                  : 'Enter a description',
+            ),
           ],
-        ));
+        ),
+      ),
+    );
   }
 }

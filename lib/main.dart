@@ -53,7 +53,7 @@ class HomePage extends StatelessWidget {
             devtools.log(user.toString());
 
             // DEBUG !!!!!
-            return const ProfileScreenView();
+            //return const ProfileScreenView();
 
             if (user != null) {
               // Reload Users Status

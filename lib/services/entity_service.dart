@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS "entry" (
       throw UserAlreadyExists();
     }
 
-    await db.insert(userTable, {
+    await db.insert(profileTable, {
       "user_id": userID,
       "Title": Title,
       "PhotoA": PhotoA,
@@ -373,10 +373,51 @@ CREATE TABLE IF NOT EXISTS "entry" (
       whereArgs: [userID],
     );
     if (results.isEmpty) {
+      devtools.log('No existing profile found');
       throw ProfileDoesNotExist();
     } else {
       DatabaseProfile profile = DatabaseProfile.fromRow(results.first);
+      devtools.log('Existing Profile found');
       return profile;
+    }
+  }
+
+  Future<DatabaseProfile> updateProfile({
+    required DatabaseProfile profile,
+    required String title,
+    required String description,
+    required Uint8List PhotoA,
+    required Uint8List PhotoB,
+  }) async {
+    await _ensureDbIsOpen();
+    final db = _getDatabaseOrThrow();
+
+    // make sure profile exists
+    await getProfile(userID: profile.user_id);
+
+    // update DB
+    final updatesCount = await db.update(
+      profileTable,
+      {
+        //"user_id":	INTEGER UNIQUE,
+        "Title": title,
+        "PhotoA": PhotoA,
+        "PhotoB": PhotoB,
+        "Description": description,
+      },
+      where: 'user_id = ?',
+      whereArgs: [profile.user_id],
+    );
+
+    if (updatesCount == 0) {
+      throw CouldNotUpdateNote();
+    } else {
+      final updatedProfile = await getProfile(userID: profile.user_id);
+      // Should just remove Note stuff
+      //_notes.removeWhere((profile) => profile.userId == updatedProfile.user_id);
+      //_notes.add(updatedNote);
+      //_notesStreamController.add(_notes);
+      return updatedProfile;
     }
   }
 }
@@ -509,7 +550,7 @@ CREATE TABLE IF NOT EXISTS "entry" (
 ''';
 
 const createProfileTable = '''
-CREATE TABLE "Profile" (
+CREATE TABLE IF NOT EXISTS "profile" (
 	"user_id"	INTEGER UNIQUE,
 	"Title"	TEXT,
 	"PhotoA"	BLOB,
