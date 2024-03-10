@@ -12,14 +12,14 @@ import 'dart:developer' as devtools show log;
 class NotesService {
   Database? _db;
 
-  List<DatabaseNote> _notes = [];
+  List<DatabaseEntry> _notes = [];
 
   DatabaseUser? _user;
 
   // create notes service as a singleton, this is how to create singletons in dart
   static final NotesService _shared = NotesService._sharedInstance();
   NotesService._sharedInstance() {
-    _notesStreamController = StreamController<List<DatabaseNote>>.broadcast(
+    _notesStreamController = StreamController<List<DatabaseEntry>>.broadcast(
       onListen: () {
         // populate stream controller from database notes
         _notesStreamController.sink.add(_notes);
@@ -29,9 +29,9 @@ class NotesService {
   factory NotesService() => _shared;
 
   // create a stream pipeline, broadcast allows the controller to be listened to multiple times
-  late final StreamController<List<DatabaseNote>> _notesStreamController;
+  late final StreamController<List<DatabaseEntry>> _notesStreamController;
 
-  Stream<List<DatabaseNote>> get allNotes =>
+  Stream<List<DatabaseEntry>> get allNotes =>
       _notesStreamController.stream.filter((note) {
         final currentUser = _user;
         if (currentUser != null) {
@@ -69,9 +69,12 @@ class NotesService {
     _notesStreamController.add(_notes);
   }
 
-  Future<DatabaseNote> updateNote({
-    required DatabaseNote note,
+  Future<DatabaseEntry> updateNote({
+    required DatabaseEntry note,
     required String text,
+    required String title,
+    required Uint8List photoA,
+    required Uint8List photoB,
   }) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
@@ -81,9 +84,10 @@ class NotesService {
 
     // update DB
     final updatesCount = await db.update(
-      noteTable,
+      entryTable,
       {
         textColumn: text,
+        titleColumn: title,
         isSyncedWithCloudColumn: 0,
       },
       where: 'id = ?',
@@ -101,19 +105,19 @@ class NotesService {
     }
   }
 
-  Future<Iterable<DatabaseNote>> getAllNotes() async {
+  Future<Iterable<DatabaseEntry>> getAllNotes() async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    final notes = await db.query(noteTable);
+    final notes = await db.query(entryTable);
 
-    return notes.map((noteRow) => DatabaseNote.fromRow(noteRow));
+    return notes.map((noteRow) => DatabaseEntry.fromRow(noteRow));
   }
 
-  Future<DatabaseNote> getNote({required int id}) async {
+  Future<DatabaseEntry> getNote({required int id}) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final notes = await db.query(
-      noteTable,
+      entryTable,
       limit: 1,
       where: 'id = ?',
       whereArgs: [id],
@@ -122,7 +126,7 @@ class NotesService {
     if (notes.isEmpty) {
       throw CouldNotFindNote();
     } else {
-      final note = DatabaseNote.fromRow(notes.first);
+      final note = DatabaseEntry.fromRow(notes.first);
       _notes.removeWhere((note) => note.id == id);
       _notes.add(note);
       _notesStreamController.add(_notes);
@@ -133,7 +137,7 @@ class NotesService {
   Future<int> deleteAllNotes() async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
-    final numberOfDeletions = await db.delete(noteTable);
+    final numberOfDeletions = await db.delete(entryTable);
     _notes = [];
     _notesStreamController.add(_notes);
     return numberOfDeletions;
@@ -143,7 +147,7 @@ class NotesService {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
     final deletedCount = await db.delete(
-      noteTable,
+      entryTable,
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -155,7 +159,7 @@ class NotesService {
     }
   }
 
-  Future<DatabaseNote> createNote({required DatabaseUser owner}) async {
+  Future<DatabaseEntry> createNote({required DatabaseUser owner}) async {
     await _ensureDbIsOpen();
     final db = _getDatabaseOrThrow();
 
@@ -166,16 +170,20 @@ class NotesService {
     }
 
     const text = '';
+    const title = '';
     // create the note
-    final noteId = await db.insert(noteTable, {
+    final noteId = await db.insert(entryTable, {
       userIdColumn: owner.id,
       textColumn: text,
       isSyncedWithCloudColumn: 1,
     });
-
-    final note = DatabaseNote(
+// !!! RETURN
+    final note = DatabaseEntry(
       id: noteId,
       userId: owner.id,
+      title: title,
+      photoA: Uint8List(0),
+      photoB: Uint8List(0),
       text: text,
       isSyncedWithCloud: true,
     );
@@ -292,7 +300,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 );
 ''';
       await db.execute(createUserTable);
-
+/*  REMOVED INCORRECT TABLE
       const createNoteTable = '''
 CREATE TABLE IF NOT EXISTS "entry" (
 	"id"	INTEGER NOT NULL,
@@ -303,6 +311,8 @@ CREATE TABLE IF NOT EXISTS "entry" (
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );
 ''';
+*/
+      //await db.execute(dropNoteTable);
       await db.execute(createNoteTable);
 
       // !!! profile table
@@ -420,6 +430,8 @@ CREATE TABLE IF NOT EXISTS "entry" (
       return updatedProfile;
     }
   }
+
+  // Save/Load Data Functions
 }
 
 // all subtypes of class must be final
@@ -455,22 +467,31 @@ class DatabaseUser {
   int get hashCode => id.hashCode;
 }
 
-class DatabaseNote {
+class DatabaseEntry {
   final int id;
   final int userId;
+  final String title;
   final String text;
+  final Uint8List? photoA;
+  final Uint8List? photoB;
   final bool isSyncedWithCloud;
 
-  DatabaseNote(
+  DatabaseEntry(
       {required this.id,
       required this.userId,
+      required this.title,
       required this.text,
+      required this.photoA,
+      required this.photoB,
       required this.isSyncedWithCloud});
 
-  DatabaseNote.fromRow(Map<String, Object?> map)
+  DatabaseEntry.fromRow(Map<String, Object?> map)
       : id = map[idColumn] as int,
         userId = map[userIdColumn] as int,
+        title = map[titleColumn] as String? ?? '',
         text = map[textColumn] as String,
+        photoA = map[photoAColumn] as Uint8List?,
+        photoB = map[photoBColumn] as Uint8List?,
         isSyncedWithCloud =
             (map[isSyncedWithCloudColumn] as int) == 1 ? true : false;
 
@@ -480,7 +501,7 @@ class DatabaseNote {
   }
 
   @override
-  bool operator ==(covariant DatabaseNote other) => id == other.id;
+  bool operator ==(covariant DatabaseEntry other) => id == other.id;
 
   @override
   int get hashCode => id.hashCode;
@@ -521,13 +542,16 @@ class DatabaseProfile {
 }
 
 const dbName = 'notes.db';
-const noteTable = 'note';
+const entryTable = 'entry';
 const userTable = 'user';
 const profileTable = 'profile';
 const idColumn = 'id';
 const emailColumn = 'email';
 const userIdColumn = 'user_id';
 const textColumn = 'text';
+const titleColumn = 'title';
+const photoAColumn = 'PhotoA';
+const photoBColumn = 'PhotoB';
 const isSyncedWithCloudColumn = 'is_synced_with_cloud';
 
 const createUserTable = '''
@@ -542,11 +566,18 @@ const createNoteTable = '''
 CREATE TABLE IF NOT EXISTS "entry" (
 	"id"	INTEGER NOT NULL,
 	"user_id"	INTEGER NOT NULL,
+  "title"	TEXT,
 	"text"	TEXT,
+  "PhotoA"	BLOB,
+	"PhotoB"	BLOB,
 	"is_synced_with_cloud"	INTEGER DEFAULT 0,
 	FOREIGN KEY("user_id") REFERENCES "user"("ID"),
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );
+''';
+
+const dropNoteTable = '''
+DROP TABLE IF EXISTS "entry";
 ''';
 
 const createProfileTable = '''

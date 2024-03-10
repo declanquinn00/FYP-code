@@ -1,6 +1,7 @@
 import 'package:carerassistant/constants/routes.dart';
 import 'package:carerassistant/firebase_options.dart';
 import 'package:carerassistant/views/edit_profile_screen.dart';
+import 'package:carerassistant/views/notes/edit_entry_view.dart';
 import 'package:carerassistant/views/profile_screen.dart';
 import 'package:carerassistant/views/notes/entry_view.dart';
 import 'package:carerassistant/views/login_view.dart';
@@ -31,7 +32,8 @@ void main() {
         verifyEmailRoute: (context) => const VerifyEmailView(),
         createOrUpdateNoteRoute: (context) => const CreateUpdateNoteView(),
         profileViewRoute: (context) => const ProfileScreenView(),
-        editProfileViewRoute: (context) => const EditProfileScreenView()
+        editProfileViewRoute: (context) => const EditProfileScreenView(),
+        editEntryRoute: (context) => const EditEntryView(),
       },
     ),
   );

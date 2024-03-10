@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
 // !!!!!!! Takes a note and is just a function used to tell app to delete entry
-typedef NoteCallback = void Function(DatabaseNote note);
+typedef NoteCallback = void Function(DatabaseEntry note);
 
 class NotesListView extends StatelessWidget {
-  final List<DatabaseNote> notes;
+  final List<DatabaseEntry> notes;
   final NoteCallback onDeleteNote;
   final NoteCallback onTap;
 

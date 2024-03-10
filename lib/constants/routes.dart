@@ -5,3 +5,4 @@ const verifyEmailRoute = '/verify-email/';
 const createOrUpdateNoteRoute = '/notes/new-note';
 const profileViewRoute = '/profile/';
 const editProfileViewRoute = '/edit/';
+const editEntryRoute = '/notes/edit';

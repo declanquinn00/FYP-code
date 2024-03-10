@@ -1,5 +1,9 @@
+import 'dart:typed_data';
+
+import 'package:carerassistant/constants/routes.dart';
 import 'package:carerassistant/services/entity_service.dart';
 import 'package:carerassistant/utilities/generics/get_arguments.dart';
+import 'package:carerassistant/views/profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
@@ -13,42 +17,27 @@ class CreateUpdateNoteView extends StatefulWidget {
 
 class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   // ensure notes are not created multiple times on hot reload
-  DatabaseNote? _note;
+  DatabaseEntry? _note;
   late final NotesService _notesService;
-  late final TextEditingController _textController;
   @override
   void initState() {
     _notesService = NotesService();
-    _textController = TextEditingController();
     super.initState();
   }
 
-  // when textcontroller is called run this script
-  void _textControllerListener() async {
-    final note = _note;
-    if (note == null) {
-      return;
-    }
-    final text = _textController.text;
-    await _notesService.updateNote(
-      note: note,
-      text: text,
-    );
+  Future<void> _updateChanges() async {
+    final note = await _notesService.getNote(id: _note!.id);
+    setState(() {
+      _note = note;
+    });
   }
 
-  // removes and recreates textcontroller listener
-  void _setupTextControllerListener() {
-    _textController.removeListener(_textControllerListener);
-    _textController.addListener(_textControllerListener);
-  }
-
-  Future<DatabaseNote> createOrGetExistingNote(BuildContext context) async {
+  Future<DatabaseEntry> createOrGetExistingNote(BuildContext context) async {
     // get an existing note
-    final widgetNote = context.getArgument<DatabaseNote>();
+    final widgetNote = context.getArgument<DatabaseEntry>();
     // If note already exists recreate it
     if (widgetNote != null) {
       _note = widgetNote;
-      _textController.text = widgetNote.text;
       return widgetNote;
     }
     // otherwise create new note
@@ -71,7 +60,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
 
   void _deleteNoteIfTextIsEmpty() {
     final note = _note;
-    if (_textController.text.isEmpty && note != null) {
+    if (note != null && note.title.isEmpty) {
       _notesService.deleteNote(id: note.id);
     }
   }
@@ -80,21 +69,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   @override
   void dispose() {
     _deleteNoteIfTextIsEmpty();
-    _saveNoteIfTextNotEmpty();
-    _textController.dispose();
     super.dispose();
-  }
-
-  void _saveNoteIfTextNotEmpty() async {
-    final note = _note;
-    final text = _textController.text;
-    if (note != null && text.isNotEmpty) {
-      await _notesService.updateNote(
-        note: note,
-        text: text,
-      );
-    }
-    ;
   }
 
   @override
@@ -102,19 +77,57 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New Note'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              // !!! Return pushNamed!
+              Navigator.of(context)
+                  .pushNamed(editEntryRoute, arguments: _note)
+                  .then((value) {
+                devtools.log('Returned to note updating values');
+                _updateChanges();
+              });
+            },
+            icon: const Icon(Icons.edit),
+          ),
+        ],
       ),
       body: FutureBuilder(
         future: createOrGetExistingNote(context),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              _setupTextControllerListener();
-              return TextField(
-                controller: _textController,
-                keyboardType: TextInputType.multiline,
-                decoration: const InputDecoration(hintText: 'Type here...'),
-                maxLines: null,
-              );
+              return Column(children: [
+                Text(
+                  _note != null && _note!.title.isNotEmpty
+                      ? _note!.title
+                      : 'Title...',
+                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: FlutterLogo(size: 160),
+                      ),
+                    ),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: FlutterLogo(size: 160),
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  // !!!
+                  _note != null && _note!.text.isNotEmpty
+                      ? _note!.text
+                      : 'Type here...',
+                ),
+              ]);
             default:
               return const CircularProgressIndicator();
           }

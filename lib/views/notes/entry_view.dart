@@ -107,7 +107,7 @@ class _NotesViewState extends State<NotesView> {
                         return const Text('Waiting for All Notes');
                       case ConnectionState.active:
                         if (snapshot.hasData) {
-                          final allNotes = snapshot.data as List<DatabaseNote>;
+                          final allNotes = snapshot.data as List<DatabaseEntry>;
                           return NotesListView(
                             notes: allNotes,
                             onDeleteNote: (note) async {
