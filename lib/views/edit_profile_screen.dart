@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:carerassistant/constants/routes.dart';
 import 'package:carerassistant/services/entity_service.dart';
+import 'package:carerassistant/utilities/dialogs/error_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as devtools show log;
@@ -64,9 +65,9 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
         setState(() {
           _imageALoaded = _profile?.PhotoA != null ? _profile!.PhotoA : null;
           _imageBLoaded = _profile?.PhotoB != null ? _profile!.PhotoB : null;
-          _name.text = _profile!.Title.isNotEmpty ? _profile!.Title : null;
+          _name.text = _profile!.Title.isNotEmpty ? _profile!.Title : '';
           _content.text =
-              _profile!.Description.isNotEmpty ? _profile!.Description : null;
+              _profile!.Description.isNotEmpty ? _profile!.Description : '';
         });
         devtools.log('Image Data loaded');
       } else {
@@ -95,7 +96,15 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
       // !!! REPLACE WITH EMAIL !!!
       DatabaseUser user = await _notesService.getUser(email: 'quinnd13@tcd.ie');
       int userID = user.id;
-
+/*
+      //
+      // DEBUG delete a profile
+      devtools.log('DELETING PROFILE');
+      await _notesService.deleteProfile(userID: userID);
+      devtools.log('PROFILE DELETED');
+      return;
+      //
+*/
       try {
         DatabaseProfile existingProfile =
             await _notesService.getProfile(userID: userID);
@@ -115,12 +124,7 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
         DatabaseProfile updatedProfile =
             await _notesService.getProfile(userID: userID);
         devtools.log('Post Updated Profile: $updatedProfile');
-/*
-        // DEBUG delete a profile
-        devtools.log('DELETING PROFILE');
-        await _notesService.deleteProfile(userID: userID);
-        devtools.log('PROFILE DELETED');
-*/
+
         return;
       } catch (e) {
         devtools.log('Profile does not exist');
@@ -149,11 +153,15 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
         return null;
       } else {
         final selectedPhoto = File(photo.path);
-
-        setState(() {
-          _imageA = selectedPhoto;
-          //_imageALoaded = null;
-        });
+        final size = selectedPhoto.lengthSync();
+        final maxSize = 1 * 1024 * 1024; // 10 MB
+        if (size <= maxSize) {
+          setState(() {
+            _imageA = selectedPhoto;
+          });
+        } else {
+          await showErrorDialog(context, 'File too large');
+        }
       }
     } catch (e) {
       devtools.log('An Error Occurred in Selecting Image ' + e.toString());
@@ -167,10 +175,15 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
         return null;
       } else {
         final selectedPhoto = File(photo.path);
-        setState(() {
-          _imageB = selectedPhoto;
-          //_imageBLoaded = null;
-        });
+        final size = selectedPhoto.lengthSync();
+        final maxSize = 1 * 1024 * 1024; // 10 MB
+        if (size <= maxSize) {
+          setState(() {
+            _imageB = selectedPhoto;
+          });
+        } else {
+          await showErrorDialog(context, 'File too large');
+        }
       }
     } catch (e) {
       devtools.log('An Error Occurred in Selecting Image ' + e.toString());
@@ -185,6 +198,7 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
         actions: [
           IconButton(
             onPressed: () async {
+              devtools.log('SaveProfileData');
               await saveProfileData();
               devtools.log('Create/update profile complete');
               Navigator.of(context)

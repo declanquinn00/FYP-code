@@ -93,22 +93,44 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 Expanded(
-                  child: _imageA != null && _imageA!.isNotEmpty
-                      ? Image.memory(
-                          _imageA!,
-                          width: 150,
-                          height: 150,
-                        )
-                      : FlutterLogo(size: 160),
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_imageA != null && _imageA!.isNotEmpty) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Fullscreen(image: _imageA!),
+                            ));
+                      }
+                    },
+                    child: _imageA != null && _imageA!.isNotEmpty
+                        ? Image.memory(
+                            _imageA!,
+                            width: 150,
+                            height: 150,
+                          )
+                        : FlutterLogo(size: 160),
+                  ),
                 ),
                 Expanded(
-                  child: _imageB != null && _imageB!.isNotEmpty
-                      ? Image.memory(
-                          _imageB!,
-                          width: 150,
-                          height: 150,
-                        )
-                      : FlutterLogo(size: 160),
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_imageB != null && _imageB!.isNotEmpty) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Fullscreen(image: _imageB!),
+                            ));
+                      }
+                    },
+                    child: _imageB != null && _imageB!.isNotEmpty
+                        ? Image.memory(
+                            _imageB!,
+                            width: 150,
+                            height: 150,
+                          )
+                        : FlutterLogo(size: 160),
+                  ),
                 ),
               ],
             ),
@@ -120,6 +142,24 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// fullscreen image
+class Fullscreen extends StatelessWidget {
+  final Uint8List image;
+  const Fullscreen({super.key, required this.image});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Image View'),
+      ),
+      body: Center(
+        child: Image.memory(image),
       ),
     );
   }
