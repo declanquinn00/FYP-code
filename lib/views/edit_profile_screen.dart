@@ -236,23 +236,6 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
                   onTap: () {
                     selectImageA(ImageSource.gallery);
                   },
-                  /*
-                  child: _imageALoaded != null && _imageALoaded!.isNotEmpty
-                      ? _imageA != null
-                          ? Image.file(
-                              key: UniqueKey(),
-                              _imageA!,
-                              width: 150,
-                              height: 150,
-                            )
-                          : Image.memory(
-                              key: UniqueKey(),
-                              _imageALoaded!,
-                              width: 150,
-                              height: 150,
-                            )
-                      : FlutterLogo(size: 160),
-                      */
                   child: _imageA != null
                       ? Image.file(
                           key: UniqueKey(),

@@ -88,6 +88,8 @@ class NotesService {
       {
         textColumn: text,
         titleColumn: title,
+        photoAColumn: photoA,
+        photoBColumn: photoB,
         isSyncedWithCloudColumn: 0,
       },
       where: 'id = ?',
