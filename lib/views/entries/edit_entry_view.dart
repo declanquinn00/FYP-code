@@ -197,69 +197,71 @@ class _EditEntryViewState extends State<EditEntryView> {
             case ConnectionState.done:
               //_setupTextControllerListener();
               //_setupTitleControllerListener();
-              return Column(children: [
-                TextField(
-                    controller: _titleController,
-                    decoration: const InputDecoration(hintText: 'Title...')),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          // !!! RETURN convert into one function
-                          selectImageA(ImageSource.gallery);
-                        },
-                        child: _imageA != null
-                            ? Image.file(
-                                key: UniqueKey(),
-                                _imageA!,
-                                width: 150,
-                                height: 150,
-                              )
-                            : (_imageALoaded != null &&
-                                    _imageALoaded!.isNotEmpty)
-                                ? Image.memory(
-                                    key: UniqueKey(),
-                                    _imageALoaded!,
-                                    width: 150,
-                                    height: 150,
-                                  )
-                                : FlutterLogo(size: 160),
+              return SingleChildScrollView(
+                child: Column(children: [
+                  TextField(
+                      controller: _titleController,
+                      decoration: const InputDecoration(hintText: 'Title...')),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            // !!! RETURN convert into one function
+                            selectImageA(ImageSource.gallery);
+                          },
+                          child: _imageA != null
+                              ? Image.file(
+                                  key: UniqueKey(),
+                                  _imageA!,
+                                  width: 150,
+                                  height: 150,
+                                )
+                              : (_imageALoaded != null &&
+                                      _imageALoaded!.isNotEmpty)
+                                  ? Image.memory(
+                                      key: UniqueKey(),
+                                      _imageALoaded!,
+                                      width: 150,
+                                      height: 150,
+                                    )
+                                  : FlutterLogo(size: 160),
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          selectImageB(ImageSource.gallery);
-                        },
-                        child: _imageB != null
-                            ? Image.file(
-                                key: UniqueKey(),
-                                _imageB!,
-                                width: 150,
-                                height: 150,
-                              )
-                            : (_imageBLoaded != null &&
-                                    _imageBLoaded!.isNotEmpty)
-                                ? Image.memory(
-                                    key: UniqueKey(),
-                                    _imageBLoaded!,
-                                    width: 150,
-                                    height: 150,
-                                  )
-                                : FlutterLogo(size: 160),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            selectImageB(ImageSource.gallery);
+                          },
+                          child: _imageB != null
+                              ? Image.file(
+                                  key: UniqueKey(),
+                                  _imageB!,
+                                  width: 150,
+                                  height: 150,
+                                )
+                              : (_imageBLoaded != null &&
+                                      _imageBLoaded!.isNotEmpty)
+                                  ? Image.memory(
+                                      key: UniqueKey(),
+                                      _imageBLoaded!,
+                                      width: 150,
+                                      height: 150,
+                                    )
+                                  : FlutterLogo(size: 160),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                TextField(
-                  controller: _textController,
-                  keyboardType: TextInputType.multiline,
-                  decoration: const InputDecoration(hintText: 'Type here...'),
-                  maxLines: null,
-                ),
-              ]);
+                    ],
+                  ),
+                  TextField(
+                    controller: _textController,
+                    keyboardType: TextInputType.multiline,
+                    decoration: const InputDecoration(hintText: 'Type here...'),
+                    maxLines: null,
+                  ),
+                ]),
+              );
             default:
               return const CircularProgressIndicator();
           }

@@ -107,75 +107,77 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
-              return Column(children: [
-                Text(
-                  _note != null && _note!.title.isNotEmpty
-                      ? _note!.title
-                      : 'Title...',
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          if (_note != null &&
-                              _note!.photoA != null &&
-                              _note!.photoA!.isNotEmpty) {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      Fullscreen(image: _note!.photoA!),
-                                ));
-                          }
-                        },
-                        child: _note != null &&
+              return SingleChildScrollView(
+                child: Column(children: [
+                  Text(
+                    _note != null && _note!.title.isNotEmpty
+                        ? _note!.title
+                        : 'Title...',
+                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (_note != null &&
                                 _note!.photoA != null &&
-                                _note!.photoA!.isNotEmpty
-                            ? Image.memory(
-                                _note!.photoA!,
-                                width: 150,
-                                height: 150,
-                              )
-                            : FlutterLogo(size: 160),
+                                _note!.photoA!.isNotEmpty) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        Fullscreen(image: _note!.photoA!),
+                                  ));
+                            }
+                          },
+                          child: _note != null &&
+                                  _note!.photoA != null &&
+                                  _note!.photoA!.isNotEmpty
+                              ? Image.memory(
+                                  _note!.photoA!,
+                                  width: 150,
+                                  height: 150,
+                                )
+                              : FlutterLogo(size: 160),
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          if (_note != null &&
-                              _note!.photoB != null &&
-                              _note!.photoB!.isNotEmpty) {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      Fullscreen(image: _note!.photoB!),
-                                ));
-                          }
-                        },
-                        child: _note != null &&
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (_note != null &&
                                 _note!.photoB != null &&
-                                _note!.photoB!.isNotEmpty
-                            ? Image.memory(
-                                _note!.photoB!,
-                                width: 150,
-                                height: 150,
-                              )
-                            : FlutterLogo(size: 160),
+                                _note!.photoB!.isNotEmpty) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        Fullscreen(image: _note!.photoB!),
+                                  ));
+                            }
+                          },
+                          child: _note != null &&
+                                  _note!.photoB != null &&
+                                  _note!.photoB!.isNotEmpty
+                              ? Image.memory(
+                                  _note!.photoB!,
+                                  width: 150,
+                                  height: 150,
+                                )
+                              : FlutterLogo(size: 160),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                Text(
-                  // !!!
-                  _note != null && _note!.text.isNotEmpty
-                      ? _note!.text
-                      : 'Type here...',
-                ),
-              ]);
+                    ],
+                  ),
+                  Text(
+                    // !!!
+                    _note != null && _note!.text.isNotEmpty
+                        ? _note!.text
+                        : 'Type here...',
+                  ),
+                ]),
+              );
             default:
               return const CircularProgressIndicator();
           }
