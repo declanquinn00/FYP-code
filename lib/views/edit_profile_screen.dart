@@ -22,7 +22,7 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
   Uint8List? _imageBLoaded;
   late final _name;
   late final _content;
-  late final NotesService _notesService;
+  late final DatabaseService _databaseService;
   late final DatabaseProfile? _profile;
 
   // Create init late vars
@@ -30,19 +30,8 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
   void initState() {
     _name = TextEditingController();
     _content = TextEditingController();
-    _notesService = NotesService();
+    _databaseService = DatabaseService();
     _loadProfileData();
-    // Fill fields if profile is not null
-/*
-    if (_profile != null) {
-      if (_profile!.Title.isNotEmpty) {
-        _name.text = _profile!.Title;
-      }
-      if (_profile!.Description.isNotEmpty) {
-        _content.text = _profile!.Description;
-      }
-    }
-*/
     super.initState();
   }
 
@@ -56,10 +45,11 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
   Future<void> _loadProfileData() async {
     try {
       // !!! REPLACE WITH EMAIL !!!
-      DatabaseUser user = await _notesService.getUser(email: 'quinnd13@tcd.ie');
+      DatabaseUser user =
+          await _databaseService.getUser(email: 'quinnd13@tcd.ie');
       int userID = user.id;
       devtools.log('Loading Profile Data');
-      _profile = await _notesService.getProfile(userID: userID);
+      _profile = await _databaseService.getProfile(userID: userID);
       devtools.log('Profile Data loaded');
       if (_profile != null) {
         setState(() {
@@ -94,26 +84,27 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
               : Uint8List(0);
 
       // !!! REPLACE WITH EMAIL !!!
-      DatabaseUser user = await _notesService.getUser(email: 'quinnd13@tcd.ie');
+      DatabaseUser user =
+          await _databaseService.getUser(email: 'quinnd13@tcd.ie');
       int userID = user.id;
 /*
       //
       // DEBUG delete a profile
       devtools.log('DELETING PROFILE');
-      await _notesService.deleteProfile(userID: userID);
+      await _databaseService.deleteProfile(userID: userID);
       devtools.log('PROFILE DELETED');
       return;
       //
 */
       try {
         DatabaseProfile existingProfile =
-            await _notesService.getProfile(userID: userID);
+            await _databaseService.getProfile(userID: userID);
         // If a profile exists, you can handle it here
         devtools.log('Profile already exists, updating...');
         devtools.log('Pre Updated Profile: $existingProfile');
 
         // Update existing profile
-        await _notesService.updateProfile(
+        await _databaseService.updateProfile(
           profile: existingProfile,
           title: title,
           description: description,
@@ -122,7 +113,7 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
         );
         devtools.log('Profile updated successfully');
         DatabaseProfile updatedProfile =
-            await _notesService.getProfile(userID: userID);
+            await _databaseService.getProfile(userID: userID);
         devtools.log('Post Updated Profile: $updatedProfile');
 
         return;
@@ -131,7 +122,7 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
       }
 
       // create new profile
-      await _notesService.createProfile(
+      await _databaseService.createProfile(
         userID: userID,
         Title: title,
         PhotoA: photoABytes,
@@ -139,7 +130,8 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
         Description: description,
       );
       // !!! DEBUG
-      DatabaseProfile profile = await _notesService.getProfile(userID: userID);
+      DatabaseProfile profile =
+          await _databaseService.getProfile(userID: userID);
       devtools.log('Saved Profile: $profile');
     } catch (e) {
       devtools.log('Updating Profile Error: $e');

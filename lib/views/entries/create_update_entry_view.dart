@@ -8,27 +8,27 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
-class CreateUpdateNoteView extends StatefulWidget {
-  const CreateUpdateNoteView({super.key});
+class CreateUpdateEntryView extends StatefulWidget {
+  const CreateUpdateEntryView({super.key});
 
   @override
-  State<CreateUpdateNoteView> createState() => _CreateUpdateNoteViewState();
+  State<CreateUpdateEntryView> createState() => _CreateUpdateEntryViewState();
 }
 
-class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
+class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
   // ensure notes are not created multiple times on hot reload
   DatabaseEntry? _note;
-  late final NotesService _notesService;
+  late final DatabaseService _notesService;
 
   @override
   void initState() {
-    _notesService = NotesService();
+    _notesService = DatabaseService();
     super.initState();
   }
 
   Future<void> _updateChanges() async {
     devtools.log('Updating Changes...');
-    final note = await _notesService.getNote(id: _note!.id);
+    final note = await _notesService.getEntry(id: _note!.id);
     setState(() {
       _note = note;
     });
@@ -57,7 +57,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
       // !!!!!!!
       final owner = await _notesService.getUser(email: email);
       devtools.log("Owner found");
-      final newNote = await _notesService.createNote(owner: owner);
+      final newNote = await _notesService.createEntry(owner: owner);
       _note = newNote;
       final noteId = _note!.id.toString();
       devtools.log('DEBUG Note ID $noteId');
@@ -71,7 +71,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
   void _deleteNoteIfTextIsEmpty() {
     final note = _note;
     if (note != null && note.title.isEmpty) {
-      _notesService.deleteNote(id: note.id);
+      _notesService.deleteEntry(id: note.id);
     }
   }
 

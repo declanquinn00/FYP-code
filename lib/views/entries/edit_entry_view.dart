@@ -19,18 +19,18 @@ class EditEntryView extends StatefulWidget {
 }
 
 class _EditEntryViewState extends State<EditEntryView> {
-  // ensure notes are not created multiple times on hot reload
-  DatabaseEntry? _note;
+  // ensure entries are not created multiple times on hot reload
+  DatabaseEntry? _entry;
   File? _imageA;
   File? _imageB;
   Uint8List? _imageALoaded;
   Uint8List? _imageBLoaded;
-  late final NotesService _notesService;
+  late final DatabaseService _databaseService;
   late final TextEditingController _textController;
   late final TextEditingController _titleController;
   @override
   void initState() {
-    _notesService = NotesService();
+    _databaseService = DatabaseService();
     _textController = TextEditingController();
     _titleController = TextEditingController();
     super.initState();
@@ -80,52 +80,52 @@ class _EditEntryViewState extends State<EditEntryView> {
     }
   }
 
-  Future<DatabaseEntry> createOrGetExistingNote(BuildContext context) async {
-    // check if note exists
+  Future<DatabaseEntry> createOrGetExistingEntry(BuildContext context) async {
+    // check if entry exists
     devtools.log('Getting or creating Database Entry');
-    if (_note == null) {
-      final widgetNote = context.getArgument<DatabaseEntry>();
-      // pull any existing note
-      if (widgetNote != null) {
+    if (_entry == null) {
+      final widgetEntry = context.getArgument<DatabaseEntry>();
+      // pull any existing entry
+      if (widgetEntry != null) {
         devtools.log('Getting Database Entry');
-        _note = widgetNote;
-        _textController.text = widgetNote.text;
-        _titleController.text = widgetNote.title;
+        _entry = widgetEntry;
+        _textController.text = widgetEntry.text;
+        _titleController.text = widgetEntry.title;
         // !!! RETURN imageAloaded and b setup
-        _imageALoaded = widgetNote.photoA;
-        _imageBLoaded = widgetNote.photoB;
-        return widgetNote;
+        _imageALoaded = widgetEntry.photoA;
+        _imageBLoaded = widgetEntry.photoB;
+        return widgetEntry;
       }
-      // else create new note
-      final existingNote = _note;
-      if (existingNote != null) {
-        return existingNote;
+      // else create new entry
+      final existingEntry = _entry;
+      if (existingEntry != null) {
+        return existingEntry;
       }
-      devtools.log("No existing Note, creating new one...");
+      devtools.log("No existing Entry, creating new one...");
       final currentUser =
           FirebaseAuth.instance.currentUser!; // we expect a current user here
       final email = currentUser.email!;
       devtools.log("Email: " + email);
       // !!!!!!!
-      final owner = await _notesService.getUser(email: email);
+      final owner = await _databaseService.getUser(email: email);
       devtools.log("Owner found");
-      final newNote = await _notesService.createNote(owner: owner);
-      _note = newNote;
-      final noteId = _note!.id.toString();
-      devtools.log('DEBUG Note ID $noteId');
-      return newNote;
+      final newEntry = await _databaseService.createEntry(owner: owner);
+      _entry = newEntry;
+      final entryId = _entry!.id.toString();
+      devtools.log('DEBUG Entry ID $entryId');
+      return newEntry;
     } else {
-      devtools.log('Existing Note found!');
-      final noteId = _note!.id.toString();
-      devtools.log('DEBUG Note ID $noteId');
-      return _note!;
+      devtools.log('Existing Entry found!');
+      final entryId = _entry!.id.toString();
+      devtools.log('DEBUG Entry ID $entryId');
+      return _entry!;
     }
   }
 
-  void _deleteNoteIfTitleIsEmpty() {
-    final note = _note;
-    if (_titleController.text.isEmpty && note != null) {
-      _notesService.deleteNote(id: note.id);
+  void _deleteEntryIfTitleIsEmpty() {
+    final entry = _entry;
+    if (_titleController.text.isEmpty && entry != null) {
+      _databaseService.deleteEntry(id: entry.id);
     }
   }
 
@@ -152,48 +152,35 @@ class _EditEntryViewState extends State<EditEntryView> {
 
       // Get Current Entry ID
 
-      await _notesService.updateNote(
-        note: widgetEntry,
+      await _databaseService.updateEntry(
+        entry: widgetEntry,
         text: text,
         title: title,
         photoA: imageABytes,
         photoB: imageBBytes,
       );
       devtools.log('Saved Successfully!');
-      DatabaseEntry newWidgetEntry = await _notesService.getNote(id: id);
+      DatabaseEntry newWidgetEntry = await _databaseService.getEntry(id: id);
       Navigator.pop(context, newWidgetEntry);
     } catch (e) {
       devtools.log('Error saving Entry: $e');
     }
   }
 
-  // logi for removing/saving notes
+  // logi for removing entries
   @override
   void dispose() {
-    _deleteNoteIfTitleIsEmpty();
+    _deleteEntryIfTitleIsEmpty();
     _textController.dispose();
     _titleController.dispose();
     super.dispose();
   }
 
-/*
-  void _saveNoteIfTextNotEmpty() async {
-    final note = _note;
-    final text = _textController.text;
-    if (note != null && text.isNotEmpty) {
-      await _notesService.updateNote(
-        note: note,
-        text: text,
-      );
-    }
-    ;
-  }
-*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Note'),
+        title: const Text('New Entry'),
         actions: [
           IconButton(
             onPressed: () async {
@@ -204,7 +191,7 @@ class _EditEntryViewState extends State<EditEntryView> {
         ],
       ),
       body: FutureBuilder(
-        future: createOrGetExistingNote(context),
+        future: createOrGetExistingEntry(context),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:

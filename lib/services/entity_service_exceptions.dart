@@ -10,14 +10,14 @@ class UserAlreadyExists implements Exception {}
 
 class CouldNotFindUser implements Exception {}
 
-class CouldNotDeleteNote implements Exception {}
+class CouldNotDeleteEntry implements Exception {}
 
-class CouldNotFindNote implements Exception {}
+class CouldNotFindEntry implements Exception {}
 
-class CouldNotUpdateNote implements Exception {}
+class CouldNotUpdateEntry implements Exception {}
 
 class EmailNotFound implements Exception {}
 
-class UserShouldBeSetBeforeReadingAllNotes implements Exception {}
+class UserShouldBeSetBeforeReadingAllEntries implements Exception {}
 
 class ProfileDoesNotExist implements Exception {}

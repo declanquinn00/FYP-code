@@ -19,15 +19,16 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
   Uint8List? _imageB;
   late final _name;
   late final _content;
-  late final NotesService _notesService;
+  late final DatabaseService _databaseService;
   late DatabaseProfile? _profile;
 
   Future<void> _loadProfileData() async {
     try {
       // !!! REPLACE WITH EMAIL !!!
-      DatabaseUser user = await _notesService.getUser(email: 'quinnd13@tcd.ie');
+      DatabaseUser user =
+          await _databaseService.getUser(email: 'quinnd13@tcd.ie');
       int userID = user.id;
-      _profile = await _notesService.getProfile(userID: userID);
+      _profile = await _databaseService.getProfile(userID: userID);
       if (_profile != null) {
         setState(() {
           _imageA = _profile!.PhotoA != null ? _profile!.PhotoA! : null;
@@ -42,18 +43,11 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
   // open the database
   @override
   void initState() {
-    _notesService = NotesService();
+    _databaseService = DatabaseService();
     _profile = null;
     _loadProfileData();
     super.initState();
   }
-/*
-  @override
-  void dispose() {
-    _notesService.close();
-    super.dispose();
-  }
-*/
 
   @override
   Widget build(BuildContext context) {

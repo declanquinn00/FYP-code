@@ -3,35 +3,35 @@ import 'package:carerassistant/utilities/dialogs/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
-// !!!!!!! Takes a note and is just a function used to tell app to delete entry
-typedef NoteCallback = void Function(DatabaseEntry note);
+// !!!!!!! Takes an entry and is just a function used to tell app to delete entry
+typedef EntryCallback = void Function(DatabaseEntry entry);
 
-class NotesListView extends StatelessWidget {
-  final List<DatabaseEntry> notes;
-  final NoteCallback onDeleteNote;
-  final NoteCallback onTap;
+class EntryListView extends StatelessWidget {
+  final List<DatabaseEntry> entries;
+  final EntryCallback onDeleteEntry;
+  final EntryCallback onTap;
 
-  const NotesListView({
+  const EntryListView({
     Key? key,
-    required this.notes,
-    required this.onDeleteNote,
+    required this.entries,
+    required this.onDeleteEntry,
     required this.onTap,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: notes.length,
+      itemCount: entries.length,
       itemBuilder: (context, index) {
-        final note = notes[index];
-        // notes list items
+        final entry = entries[index];
+        // entry list items
         return ListTile(
           onTap: () {
-            onTap(note);
-            devtools.log('Note tapped');
+            onTap(entry);
+            devtools.log('Entry tapped');
           },
           title: Text(
-            note.title,
+            entry.title,
             maxLines: 1,
             softWrap: true,
             overflow: TextOverflow.ellipsis,
@@ -41,7 +41,7 @@ class NotesListView extends StatelessWidget {
             onPressed: () async {
               final shouldDelete = await showDeleteDialog(context);
               if (shouldDelete) {
-                onDeleteNote(note);
+                onDeleteEntry(entry);
               }
             },
             icon: const Icon(Icons.delete),
