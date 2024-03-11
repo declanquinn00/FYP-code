@@ -122,9 +122,9 @@ class _EditEntryViewState extends State<EditEntryView> {
     }
   }
 
-  void _deleteNoteIfTextIsEmpty() {
+  void _deleteNoteIfTitleIsEmpty() {
     final note = _note;
-    if (_textController.text.isEmpty && note != null) {
+    if (_titleController.text.isEmpty && note != null) {
       _notesService.deleteNote(id: note.id);
     }
   }
@@ -170,7 +170,7 @@ class _EditEntryViewState extends State<EditEntryView> {
   // logi for removing/saving notes
   @override
   void dispose() {
-    _deleteNoteIfTextIsEmpty();
+    _deleteNoteIfTitleIsEmpty();
     _textController.dispose();
     _titleController.dispose();
     super.dispose();
