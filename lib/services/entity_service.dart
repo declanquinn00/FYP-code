@@ -179,7 +179,7 @@ class DatabaseService {
       textColumn: text,
       isSyncedWithCloudColumn: 1,
     });
-// !!! RETURN
+
     final entry = DatabaseEntry(
       id: entryId,
       userId: owner.id,
@@ -187,7 +187,7 @@ class DatabaseService {
       photoA: Uint8List(0),
       photoB: Uint8List(0),
       text: text,
-      isSyncedWithCloud: true,
+      isSyncedWithCloud: true, // not being used
     );
 
     _entries.add(entry);
@@ -507,7 +507,6 @@ class DatabaseProfile {
       required this.PhotoB,
       required this.Description});
 
-// !!! Photos must be mapped correctly
   DatabaseProfile.fromRow(Map<String, Object?> map)
       : user_id = map['user_id'] as int,
         Title = map['Title'] as String,

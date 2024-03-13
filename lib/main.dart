@@ -60,14 +60,6 @@ class HomePage extends StatelessWidget {
               // Reload Users Status
               devtools.log('Email is Verified');
               return const EntryView();
-              /*
-              if (user.emailVerified) {
-                devtools.log('Email is Verified');
-                return const EntryView();
-              } else {
-                return const VerifyEmailView();
-              }
-              */
             } else {
               return const LoginView();
             }
