@@ -46,8 +46,10 @@ class _EntryViewState extends State<EntryView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
         title: const Text('Home'),
+        backgroundColor: Colors.blue,
         actions: [
           IconButton(
             onPressed: () {

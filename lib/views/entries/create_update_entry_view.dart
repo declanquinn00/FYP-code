@@ -85,8 +85,10 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
         title: const Text('Entry'),
+        backgroundColor: Colors.blue,
         actions: [
           IconButton(
             onPressed: () async {

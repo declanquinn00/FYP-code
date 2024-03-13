@@ -182,8 +182,10 @@ class _EditEntryViewState extends State<EditEntryView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
         title: const Text('Edit Entry'),
+        backgroundColor: Colors.blue,
         actions: [
           IconButton(
             onPressed: () async {

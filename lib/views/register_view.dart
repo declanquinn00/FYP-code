@@ -36,21 +36,45 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
+      appBar: AppBar(
+        title: const Text('Register'),
+        backgroundColor: Colors.blue,
+      ),
+      backgroundColor: Colors.grey[300],
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const SizedBox(height: 15),
           TextField(
             controller: _email,
             keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(hintText: 'Email'),
+            decoration: InputDecoration(
+                hintText: "Email",
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: BorderSide.none),
+                fillColor: Colors.blue.withOpacity(0.2),
+                filled: true,
+                prefixIcon: const Icon(Icons.door_front_door)),
           ),
+          const SizedBox(height: 15),
           TextField(
-              controller: _password,
-              obscureText: true,
-              enableSuggestions: false,
-              autocorrect: false,
-              decoration: const InputDecoration(hintText: 'Password')),
-          TextButton(
+            controller: _password,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+            decoration: InputDecoration(
+              hintText: "Password",
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none),
+              fillColor: Colors.blue.withOpacity(0.2),
+              filled: true,
+              prefixIcon: const Icon(Icons.lock),
+            ),
+          ),
+          const SizedBox(height: 15),
+          ElevatedButton(
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
@@ -82,7 +106,8 @@ class _RegisterViewState extends State<RegisterView> {
             },
             child: const Text('Register'),
           ),
-          TextButton(
+          const SizedBox(height: 10),
+          ElevatedButton(
             onPressed: () {
               // remove everything on screen and display next screen
               Navigator.of(context).pushNamedAndRemoveUntil(

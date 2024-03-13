@@ -226,8 +226,10 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
         title: const Text('Edit Profile'),
+        backgroundColor: Colors.blue,
         actions: [
           IconButton(
             onPressed: () async {
