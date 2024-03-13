@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:carerassistant/constants/routes.dart';
 import 'package:carerassistant/services/entity_service.dart';
+import 'package:carerassistant/services/entity_service_exceptions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:developer' as devtools show log;
@@ -22,11 +24,25 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
   late final DatabaseService _databaseService;
   late DatabaseProfile? _profile;
 
+  String userEmail() {
+    final user = FirebaseAuth.instance.currentUser;
+    try {
+      if (user != null) {
+        // user has to have an email
+        return user.email!;
+      } else {
+        throw EmailNotFound();
+      }
+    } catch (e) {
+      throw EmailNotFound();
+    }
+  }
+
   Future<void> _loadProfileData() async {
     try {
+      final email = userEmail();
       // !!! REPLACE WITH EMAIL !!!
-      DatabaseUser user =
-          await _databaseService.getUser(email: 'quinnd13@tcd.ie');
+      DatabaseUser user = await _databaseService.getUser(email: email);
       int userID = user.id;
       _profile = await _databaseService.getProfile(userID: userID);
       if (_profile != null) {

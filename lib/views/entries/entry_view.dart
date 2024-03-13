@@ -38,6 +38,8 @@ class _EntryViewState extends State<EntryView> {
   @override
   void initState() {
     _databaseService = DatabaseService();
+    //_databaseService.deleteAllEntries();
+    devtools.log('[DEBUG] Deleted all entries');
     super.initState();
   }
 

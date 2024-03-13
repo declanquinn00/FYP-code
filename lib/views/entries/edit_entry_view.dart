@@ -36,6 +36,7 @@ class _EditEntryViewState extends State<EditEntryView> {
     super.initState();
   }
 
+/*
   Future selectImageA(ImageSource source) async {
     try {
       final photo = await ImagePicker().pickImage(source: source);
@@ -44,7 +45,7 @@ class _EditEntryViewState extends State<EditEntryView> {
       } else {
         final selectedPhoto = File(photo.path);
         final size = selectedPhoto.lengthSync();
-        final maxSize = 1 * 1024 * 1024; // 10 MB
+        final maxSize = 2 * 1024 * 1024; // 2 MB
         if (size <= maxSize) {
           setState(() {
             _imageA = selectedPhoto;
@@ -57,26 +58,28 @@ class _EditEntryViewState extends State<EditEntryView> {
       devtools.log('An Error Occurred in Selecting Image ' + e.toString());
     }
   }
-
-  Future selectImageB(ImageSource source) async {
+*/
+  Future<File?> selectImage(ImageSource source) async {
     try {
-      final photo = await ImagePicker().pickImage(source: source);
+      final photo = await ImagePicker().pickImage(
+          source: source, imageQuality: 25, requestFullMetadata: false);
       if (photo == null) {
         return null;
       } else {
         final selectedPhoto = File(photo.path);
         final size = selectedPhoto.lengthSync();
-        final maxSize = 1 * 1024 * 1024; // 10 MB
+        final maxSize = 2 * 1024 * 1024; // 2 MB after compression!
         if (size <= maxSize) {
-          setState(() {
-            _imageB = selectedPhoto;
-          });
+          return selectedPhoto;
         } else {
           await showErrorDialog(context, 'File too large');
+          return null;
         }
       }
     } catch (e) {
       devtools.log('An Error Occurred in Selecting Image ' + e.toString());
+      await showErrorDialog(context, 'An error occurred uploading this image');
+      return null;
     }
   }
 
@@ -180,7 +183,7 @@ class _EditEntryViewState extends State<EditEntryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Entry'),
+        title: const Text('Edit Entry'),
         actions: [
           IconButton(
             onPressed: () async {
@@ -207,9 +210,15 @@ class _EditEntryViewState extends State<EditEntryView> {
                     children: [
                       Expanded(
                         child: GestureDetector(
-                          onTap: () {
+                          onTap: () async {
                             // !!! RETURN convert into one function
-                            selectImageA(ImageSource.gallery);
+                            final image =
+                                await selectImage(ImageSource.gallery);
+                            if (image != null) {
+                              setState(() {
+                                _imageA = image;
+                              });
+                            }
                           },
                           child: _imageA != null
                               ? Image.file(
@@ -231,8 +240,14 @@ class _EditEntryViewState extends State<EditEntryView> {
                       ),
                       Expanded(
                         child: GestureDetector(
-                          onTap: () {
-                            selectImageB(ImageSource.gallery);
+                          onTap: () async {
+                            final image =
+                                await selectImage(ImageSource.gallery);
+                            if (image != null) {
+                              setState(() {
+                                _imageB = image;
+                              });
+                            }
                           },
                           child: _imageB != null
                               ? Image.file(
