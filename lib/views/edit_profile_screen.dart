@@ -60,7 +60,6 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
 
   Future<void> _loadProfileData() async {
     try {
-      // !!! REPLACE WITH EMAIL !!!
       final email = userEmail();
       DatabaseUser user = await _databaseService.getUser(email: email);
       int userID = user.id;
@@ -100,7 +99,6 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
               : Uint8List(0);
 
       final email = userEmail();
-      // !!! REPLACE WITH EMAIL !!!
       DatabaseUser user = await _databaseService.getUser(email: email);
       int userID = user.id;
 /*
@@ -178,51 +176,6 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
     }
   }
 
-/*
-  Future selectImageA(ImageSource source) async {
-    try {
-      final photo = await ImagePicker().pickImage(source: source);
-      if (photo == null) {
-        return null;
-      } else {
-        final selectedPhoto = File(photo.path);
-        final size = selectedPhoto.lengthSync();
-        final maxSize = 2 * 1024 * 1024; // 2 MB
-        if (size <= maxSize) {
-          setState(() {
-            _imageA = selectedPhoto;
-          });
-        } else {
-          await showErrorDialog(context, 'File too large');
-        }
-      }
-    } catch (e) {
-      devtools.log('An Error Occurred in Selecting Image ' + e.toString());
-    }
-  }
-
-  Future selectImageB(ImageSource source) async {
-    try {
-      final photo = await ImagePicker().pickImage(source: source);
-      if (photo == null) {
-        return null;
-      } else {
-        final selectedPhoto = File(photo.path);
-        final size = selectedPhoto.lengthSync();
-        final maxSize = 2 * 1024 * 1024; // 2 MB
-        if (size <= maxSize) {
-          setState(() {
-            _imageB = selectedPhoto;
-          });
-        } else {
-          await showErrorDialog(context, 'File too large');
-        }
-      }
-    } catch (e) {
-      devtools.log('An Error Occurred in Selecting Image ' + e.toString());
-    }
-  }
-*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -3,7 +3,7 @@ import 'package:carerassistant/utilities/dialogs/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
-// !!!!!!! Takes an entry and is just a function used to tell app to delete entry
+// Takes an entry and is just a function used to tell app to perform certain actions when called
 typedef EntryCallback = void Function(DatabaseEntry entry);
 
 class EntryListView extends StatelessWidget {

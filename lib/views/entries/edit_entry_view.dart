@@ -36,29 +36,6 @@ class _EditEntryViewState extends State<EditEntryView> {
     super.initState();
   }
 
-/*
-  Future selectImageA(ImageSource source) async {
-    try {
-      final photo = await ImagePicker().pickImage(source: source);
-      if (photo == null) {
-        return null;
-      } else {
-        final selectedPhoto = File(photo.path);
-        final size = selectedPhoto.lengthSync();
-        final maxSize = 2 * 1024 * 1024; // 2 MB
-        if (size <= maxSize) {
-          setState(() {
-            _imageA = selectedPhoto;
-          });
-        } else {
-          await showErrorDialog(context, 'File too large');
-        }
-      }
-    } catch (e) {
-      devtools.log('An Error Occurred in Selecting Image ' + e.toString());
-    }
-  }
-*/
   Future<File?> selectImage(ImageSource source) async {
     try {
       final photo = await ImagePicker().pickImage(
@@ -94,7 +71,6 @@ class _EditEntryViewState extends State<EditEntryView> {
         _entry = widgetEntry;
         _textController.text = widgetEntry.text;
         _titleController.text = widgetEntry.title;
-        // !!! RETURN imageAloaded and b setup
         _imageALoaded = widgetEntry.photoA;
         _imageBLoaded = widgetEntry.photoB;
         return widgetEntry;
@@ -108,10 +84,7 @@ class _EditEntryViewState extends State<EditEntryView> {
       final currentUser =
           FirebaseAuth.instance.currentUser!; // we expect a current user here
       final email = currentUser.email!;
-      devtools.log("Email: " + email);
-      // !!!!!!!
       final owner = await _databaseService.getUser(email: email);
-      devtools.log("Owner found");
       final newEntry = await _databaseService.createEntry(owner: owner);
       _entry = newEntry;
       final entryId = _entry!.id.toString();
@@ -138,9 +111,6 @@ class _EditEntryViewState extends State<EditEntryView> {
       final id = widgetEntry!.id;
       String title = _titleController.text;
       String text = _textController.text;
-
-      // DEBUG !!!
-      devtools.log('Value of imageABytes: $_imageA');
 
       Uint8List imageABytes = _imageA != null
           ? await _imageA!.readAsBytes()
@@ -213,7 +183,6 @@ class _EditEntryViewState extends State<EditEntryView> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () async {
-                            // !!! RETURN convert into one function
                             final image =
                                 await selectImage(ImageSource.gallery);
                             if (image != null) {

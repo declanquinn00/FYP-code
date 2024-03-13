@@ -41,7 +41,6 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
   Future<void> _loadProfileData() async {
     try {
       final email = userEmail();
-      // !!! REPLACE WITH EMAIL !!!
       DatabaseUser user = await _databaseService.getUser(email: email);
       int userID = user.id;
       _profile = await _databaseService.getProfile(userID: userID);

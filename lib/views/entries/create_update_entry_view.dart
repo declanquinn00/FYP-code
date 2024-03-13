@@ -53,9 +53,7 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
           FirebaseAuth.instance.currentUser!; // we expect a current user here
       final email = currentUser.email!;
       devtools.log("Email: " + email);
-      // !!!!!!!
       final owner = await _databaseService.getUser(email: email);
-      devtools.log("Owner found");
       final newEntry = await _databaseService.createEntry(owner: owner);
       _entry = newEntry;
       final entryId = _entry!.id.toString();
@@ -172,7 +170,6 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
                     ],
                   ),
                   Text(
-                    // !!!
                     _entry != null && _entry!.text.isNotEmpty
                         ? _entry!.text
                         : 'Type here...',
