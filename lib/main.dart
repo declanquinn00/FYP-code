@@ -7,7 +7,7 @@ import 'package:carerassistant/views/entries/entry_view.dart';
 import 'package:carerassistant/views/login_view.dart';
 import 'package:carerassistant/views/entries/create_update_entry_view.dart';
 import 'package:carerassistant/views/register_view.dart';
-import 'package:carerassistant/views/verify_email_view.dart';
+//import 'package:carerassistant/views/verify_email_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +29,6 @@ void main() {
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
         homeRoute: (context) => const EntryView(),
-        verifyEmailRoute: (context) => const VerifyEmailView(),
         createOrUpdateEntryRoute: (context) => const CreateUpdateEntryView(),
         profileViewRoute: (context) => const ProfileScreenView(),
         editProfileViewRoute: (context) => const EditProfileScreenView(),
@@ -59,12 +58,16 @@ class HomePage extends StatelessWidget {
 
             if (user != null) {
               // Reload Users Status
+              devtools.log('Email is Verified');
+              return const EntryView();
+              /*
               if (user.emailVerified) {
                 devtools.log('Email is Verified');
                 return const EntryView();
               } else {
                 return const VerifyEmailView();
               }
+              */
             } else {
               return const LoginView();
             }

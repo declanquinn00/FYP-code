@@ -84,12 +84,13 @@ class _RegisterViewState extends State<RegisterView> {
                         email: email, password: password);
                 print(userCredential);
                 final user = FirebaseAuth.instance.currentUser;
-                await user?.sendEmailVerification();
+                //await user?.sendEmailVerification();
                 // add option of returning from mistake inputted
-                Navigator.of(context).pushNamed(verifyEmailRoute);
+                Navigator.of(context).pushNamed(loginRoute);
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'weak-password') {
-                  await showErrorDialog(context, 'User not found');
+                  await showErrorDialog(
+                      context, 'Weak password try another one');
                   devtools.log('User not found');
                 } else if (e.code == 'email-already-in-use') {
                   await showErrorDialog(context, 'Email already in use');

@@ -16,69 +16,68 @@ class CreateUpdateEntryView extends StatefulWidget {
 }
 
 class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
-  // ensure notes are not created multiple times on hot reload
-  DatabaseEntry? _note;
-  late final DatabaseService _notesService;
+  DatabaseEntry? _entry;
+  late final DatabaseService _databaseService;
 
   @override
   void initState() {
-    _notesService = DatabaseService();
+    _databaseService = DatabaseService();
     super.initState();
   }
 
   Future<void> _updateChanges() async {
     devtools.log('Updating Changes...');
-    final note = await _notesService.getEntry(id: _note!.id);
+    final entry = await _databaseService.getEntry(id: _entry!.id);
     setState(() {
-      _note = note;
+      _entry = entry;
     });
   }
 
-  Future<DatabaseEntry> createOrGetExistingNote(BuildContext context) async {
-    // get an existing note
-    if (_note == null) {
+  Future<DatabaseEntry> createOrGetExistingEntry(BuildContext context) async {
+    // get an existing entry
+    if (_entry == null) {
       devtools.log("Going through this again...");
-      final widgetNote = context.getArgument<DatabaseEntry>();
+      final widgetEntry = context.getArgument<DatabaseEntry>();
       // If note already exists recreate it
-      if (widgetNote != null) {
-        _note = widgetNote;
-        return widgetNote;
+      if (widgetEntry != null) {
+        _entry = widgetEntry;
+        return widgetEntry;
       }
-      // otherwise create new note
-      final existingNote = _note;
-      if (existingNote != null) {
-        return existingNote;
+      // otherwise create entry
+      final existingEntry = _entry;
+      if (existingEntry != null) {
+        return existingEntry;
       }
-      devtools.log("No existing Note, creating new one...");
+      devtools.log("No existing Entry, creating new one...");
       final currentUser =
           FirebaseAuth.instance.currentUser!; // we expect a current user here
       final email = currentUser.email!;
       devtools.log("Email: " + email);
       // !!!!!!!
-      final owner = await _notesService.getUser(email: email);
+      final owner = await _databaseService.getUser(email: email);
       devtools.log("Owner found");
-      final newNote = await _notesService.createEntry(owner: owner);
-      _note = newNote;
-      final noteId = _note!.id.toString();
-      devtools.log('DEBUG Note ID $noteId');
+      final newEntry = await _databaseService.createEntry(owner: owner);
+      _entry = newEntry;
+      final entryId = _entry!.id.toString();
+      devtools.log('DEBUG Entry ID $entryId');
 
-      return newNote;
+      return newEntry;
     } else {
-      return _note!;
+      return _entry!;
     }
   }
 
-  void _deleteNoteIfTextIsEmpty() {
-    final note = _note;
-    if (note != null && note.title.isEmpty) {
-      _notesService.deleteEntry(id: note.id);
+  void _deleteEntryIfTextIsEmpty() {
+    final Entry = _entry;
+    if (Entry != null && Entry.title.isEmpty) {
+      _databaseService.deleteEntry(id: Entry.id);
     }
   }
 
-  // logi for removing/saving notes
+  // logi for removing/saving entries
   @override
   void dispose() {
-    _deleteNoteIfTextIsEmpty();
+    _deleteEntryIfTextIsEmpty();
     super.dispose();
   }
 
@@ -94,9 +93,9 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
             onPressed: () async {
               // !!! Return pushNamed!
               Navigator.of(context)
-                  .pushNamed(editEntryRoute, arguments: _note)
+                  .pushNamed(editEntryRoute, arguments: _entry)
                   .then((value) {
-                devtools.log('Returned to note updating values');
+                devtools.log('Returned to entry updating values');
                 _updateChanges();
               });
             },
@@ -105,15 +104,15 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
         ],
       ),
       body: FutureBuilder(
-        future: createOrGetExistingNote(context),
+        future: createOrGetExistingEntry(context),
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.done:
               return SingleChildScrollView(
                 child: Column(children: [
                   Text(
-                    _note != null && _note!.title.isNotEmpty
-                        ? _note!.title
+                    _entry != null && _entry!.title.isNotEmpty
+                        ? _entry!.title
                         : 'Title...',
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                   ),
@@ -123,22 +122,22 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            if (_note != null &&
-                                _note!.photoA != null &&
-                                _note!.photoA!.isNotEmpty) {
+                            if (_entry != null &&
+                                _entry!.photoA != null &&
+                                _entry!.photoA!.isNotEmpty) {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        Fullscreen(image: _note!.photoA!),
+                                        Fullscreen(image: _entry!.photoA!),
                                   ));
                             }
                           },
-                          child: _note != null &&
-                                  _note!.photoA != null &&
-                                  _note!.photoA!.isNotEmpty
+                          child: _entry != null &&
+                                  _entry!.photoA != null &&
+                                  _entry!.photoA!.isNotEmpty
                               ? Image.memory(
-                                  _note!.photoA!,
+                                  _entry!.photoA!,
                                   width: 150,
                                   height: 150,
                                 )
@@ -148,22 +147,22 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            if (_note != null &&
-                                _note!.photoB != null &&
-                                _note!.photoB!.isNotEmpty) {
+                            if (_entry != null &&
+                                _entry!.photoB != null &&
+                                _entry!.photoB!.isNotEmpty) {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        Fullscreen(image: _note!.photoB!),
+                                        Fullscreen(image: _entry!.photoB!),
                                   ));
                             }
                           },
-                          child: _note != null &&
-                                  _note!.photoB != null &&
-                                  _note!.photoB!.isNotEmpty
+                          child: _entry != null &&
+                                  _entry!.photoB != null &&
+                                  _entry!.photoB!.isNotEmpty
                               ? Image.memory(
-                                  _note!.photoB!,
+                                  _entry!.photoB!,
                                   width: 150,
                                   height: 150,
                                 )
@@ -174,8 +173,8 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
                   ),
                   Text(
                     // !!!
-                    _note != null && _note!.text.isNotEmpty
-                        ? _note!.text
+                    _entry != null && _entry!.text.isNotEmpty
+                        ? _entry!.text
                         : 'Type here...',
                   ),
                 ]),
