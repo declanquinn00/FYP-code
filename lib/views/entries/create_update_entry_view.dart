@@ -86,7 +86,7 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Note'),
+        title: const Text('Entry'),
         actions: [
           IconButton(
             onPressed: () async {
