@@ -3,7 +3,7 @@ import 'package:carerassistant/main.dart';
 import 'package:carerassistant/services/entity_service.dart';
 import 'package:carerassistant/services/entity_service_exceptions.dart';
 import 'package:carerassistant/utilities/dialogs/logout_dialog.dart';
-import 'package:carerassistant/views/entries/notes_list_view.dart';
+import 'package:carerassistant/views/entries/entry_list_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;

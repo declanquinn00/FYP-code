@@ -177,6 +177,7 @@ class _EditEntryViewState extends State<EditEntryView> {
                   TextField(
                       controller: _titleController,
                       decoration: const InputDecoration(hintText: 'Title...')),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -240,6 +241,7 @@ class _EditEntryViewState extends State<EditEntryView> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 15),
                   TextField(
                     controller: _textController,
                     keyboardType: TextInputType.multiline,

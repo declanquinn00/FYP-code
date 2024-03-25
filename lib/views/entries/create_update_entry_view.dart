@@ -114,6 +114,7 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
                         : 'Title...',
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                   ),
+                  const SizedBox(height: 15),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -169,6 +170,7 @@ class _CreateUpdateEntryViewState extends State<CreateUpdateEntryView> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 15),
                   Text(
                     _entry != null && _entry!.text.isNotEmpty
                         ? _entry!.text

@@ -221,6 +221,7 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
                         hintText: 'Profile Name',
                       ),
                     ),
+                    const SizedBox(height: 15),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -283,6 +284,7 @@ class _EditProfileScreenViewState extends State<EditProfileScreenView> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 15),
                     TextField(
                       controller: _content,
                       maxLines: null,

@@ -100,6 +100,7 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
                   : 'Your Profile',
               style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
+            const SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -145,6 +146,7 @@ class _ProfileScreenViewState extends State<ProfileScreenView> {
                 ),
               ],
             ),
+            const SizedBox(height: 15),
             Text(
               // !!!
               _profile != null && _profile!.Description.isNotEmpty
